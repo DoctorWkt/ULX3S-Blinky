@@ -9,7 +9,7 @@ The latest version of _nextpnr_ supports an external constraints file.
 I have a v3.0.3 ULX3S board, and the constraints file for this is
 ```ulx3s_v20.lpf```.
 
-The ```blinky.v``` file can be simulated under Verilog, just type ```make```
+The ```blinky.v``` file can be simulated under Verilator, just type ```make```
 at the command line. It will use ```blinky_tb.cpp``` as the testbench and
 that requires ```testb.h```.
 
