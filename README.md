@@ -25,3 +25,12 @@ to tell _nextpnr_ what to do.
 
 Use ```ujprog``` from [https://github.com/emard/ulx3s-bin] to program
 your board.
+
+## Other Projects and Tips
+
+If you are using the serial link to the FT231X chip, you need to disable
+hardware flow control.
+With _minicom_, ctrl-A O, Serial port setup, F, Exit.
+
+As I get other projects to work on the board, I'll put links below:
+  * [Tic Tac Toe](https://github.com/DoctorWkt/Verilog_tic-tac-toe) using the serial port
