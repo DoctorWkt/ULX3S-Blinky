@@ -3,9 +3,10 @@
 I just got a blinky project working for my new ULX3S Board with a 45F FPGA
 chip. I had to git clone and rebuild all three of _yosys_, _trellis_ and
 _nextpnr_. Details of doing this are at https://github.com/YosysHQ/yosys
-and https://github.com/YosysHQ/nextpnr#nextpnr-ecp5 .
+and https://github.com/YosysHQ/nextpnr#nextpnr-ecp5 . I used git repos of
+the above dated early December 2018. The early November 2018 ones didn't work.
 
-The latest version of _nextpnr_ supports an external constraints file.
+The version of _nextpnr_ I'm using supports an external constraints file.
 I have a v3.0.3 ULX3S board, and the constraints file for this is
 ```ulx3s_v20.lpf```.
 
@@ -16,7 +17,7 @@ that requires ```testb.h```.
 To build the ULX3S bitstream, do a ```make ulx3s.bit``` . If you don't have
 a 45F FPGA chip, change the ```nextpnr-ecp5 --45k``` line in the Makefile
 to something more suitable. If you have an older board, you will need to
-find one that matches your board. Have a look in
+find a constraints file that matches your board. Have a look in
 https://github.com/emard/ulx3s/tree/master/doc/constraints .
 
 Making the ```ulx3s.bit``` file requires ```blinky.ys``` which tells
