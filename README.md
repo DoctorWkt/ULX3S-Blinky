@@ -36,3 +36,4 @@ With _minicom_, ctrl-A O, Serial port setup, F, Exit.
 As I get other projects to work on the board, I'll put links below:
   * [Echo characters](Echo/) on the USB serial port
   * [Tic Tac Toe](https://github.com/DoctorWkt/Verilog_tic-tac-toe) using the serial port
+  * [A 4-bit CPU](https://github.com/DoctorWkt/CSCv2/tree/master/Verilog) using the serial port
