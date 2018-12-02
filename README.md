@@ -1,4 +1,4 @@
-# A Working Blinky for The ULX3S Board
+# A Working Blinky for the ULX3S Board
 
 I just got a blinky project working for my new ULX3S Board with a 45F FPGA
 chip. I had to git clone and rebuild all three of _yosys_, _trellis_ and
@@ -33,4 +33,5 @@ hardware flow control.
 With _minicom_, ctrl-A O, Serial port setup, F, Exit.
 
 As I get other projects to work on the board, I'll put links below:
+  * [Echo characters](Echo/) on the USB serial port
   * [Tic Tac Toe](https://github.com/DoctorWkt/Verilog_tic-tac-toe) using the serial port
