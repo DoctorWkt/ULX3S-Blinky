@@ -18,3 +18,5 @@ Dan's test pattern generator.
 
 Also, as at 6th Dec 2018, this is rough code. It works as of half an hour
 ago. I do need to tidy it up, document it more and add formal verification.
+
+The dec_6_2018.jpg image is a photo of the first output from the project.
