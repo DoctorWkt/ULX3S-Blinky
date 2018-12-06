@@ -5,6 +5,7 @@
 #.DELETE_ON_ERROR:
 TOPMOD  := DVI_3x3
 TOPMOD  := llhdmi
+TOPMOD  := pattern
 VLOGFIL := $(TOPMOD).v
 VCDFILE := $(TOPMOD).vcd
 SIMPROG := $(TOPMOD)_tb
@@ -44,12 +45,12 @@ $(SIMPROG): $(SIMFILE) $(VDIRFB)/V$(TOPMOD)__ALL.a $(COSIMS)
 test: $(VCDFILE)
 
 $(VCDFILE): $(SIMPROG)
-	./$(SIMPROG)
+	./$(SIMPROG) > image.ppm
 
 ## 
 .PHONY: clean
 clean:
-	rm -rf $(VDIRFB)/ $(SIMPROG) $(VCDFILE) DVI_3x3/ ULX3S_45F.ys
+	rm -rf $(VDIRFB)/ $(SIMPROG) $(VCDFILE) image.ppm
 
 ##
 ## Find all of the Verilog dependencies and submodules

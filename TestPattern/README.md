@@ -13,8 +13,7 @@ pattern on the HDMI output.
 To do this, ```make -f UMakefile```.
 
 There is also a make with Verilator, ```make -f Makefile```. This uses the
-```DVI_3x3.v``` code from Emard. I haven't had time to rewrite this to use
-Dan's test pattern generator.
+test pattern generator and produces the image file ```image.ppm```.
 
 Also, as at 6th Dec 2018, this is rough code. It works as of half an hour
 ago. I do need to tidy it up, document it more and add formal verification.

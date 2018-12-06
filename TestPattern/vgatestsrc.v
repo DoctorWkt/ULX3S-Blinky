@@ -219,10 +219,12 @@ module	vgatestsrc(i_pixclk, i_reset,
 		h_step <= 1;
 	else if ((i_newline)&&(hfrac > 0))
 	begin
+/* verilator lint_off WIDTHCONCAT */
 		if (hfrac < {(FRACB){1'b1}} - { {(FRACB-HW){1'b0}}, WIDTH })
 			h_step <= h_step + 1'b1;
 		else if (hfrac < { {(FRACB-HW){1'b0}}, WIDTH })
 			h_step <= h_step - 1'b1;
+/* verilator lint_on WIDTHCONCAT */
 	end
 
 	always @(posedge i_pixclk)
