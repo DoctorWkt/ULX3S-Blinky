@@ -15,7 +15,10 @@ To do this, ```make -f UMakefile```.
 There is also a make with Verilator, ```make -f Makefile```. This uses the
 test pattern generator and produces the image file ```image.ppm```.
 
-Also, as at 6th Dec 2018, this is rough code. It works as of half an hour
-ago. I do need to tidy it up, document it more and add formal verification.
+The _dec_6_2018.jpg_ image is a photo of the first output from the project.
+On Dec 10, 2018, I updated the _vgatestsrc.v_ from ZipCPU, added a reset
+line and re-imported _TMDS_encoder.v_. This time, I decorated the file
+with some ```/* verilator lint_off UNOPTFLAT */``` lines because the
+code that sets ```q_m``` really isn't right. However, at least the screen
+image generated is correct.
 
-The dec_6_2018.jpg image is a photo of the first output from the project.
