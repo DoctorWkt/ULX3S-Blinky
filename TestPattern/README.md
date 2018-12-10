@@ -19,6 +19,7 @@ The _dec_6_2018.jpg_ image is a photo of the first output from the project.
 On Dec 10, 2018, I updated the _vgatestsrc.v_ from ZipCPU, added a reset
 line and re-imported _TMDS_encoder.v_. This time, I decorated the file
 with some ```/* verilator lint_off UNOPTFLAT */``` lines because the
-code that sets ```q_m``` really isn't right. However, at least the screen
-image generated is correct.
+code that sets ```q_m``` really isn't right. I've fixed this by creating
+separate wires and bundling them together afterwards. The _dec_10_2018.jpg_
+image shows the current HDMI output from the project.
 

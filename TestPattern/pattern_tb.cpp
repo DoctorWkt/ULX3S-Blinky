@@ -25,11 +25,22 @@ int	main(int argc, char **argv) {
 		if (tb->m_core->i_pixclk &&
 				(tb->m_core->i_pixclk != oldpixclk)) {
 		  if (tb->m_core->o_rd) {
+#if 1
 		    printf("%d %d %d\n",
 			tb->m_core->red,
 			tb->m_core->grn,
 			tb->m_core->blu);
 		  }
+#else
+                    printf("%x %x %x => %x %x %x\n",
+                        tb->m_core->red,
+                        tb->m_core->grn,
+                        tb->m_core->blu,
+                        tb->m_core->o_TMDS_red,
+                        tb->m_core->o_TMDS_grn,
+                        tb->m_core->o_TMDS_blu);
+                  }
+#endif
 		}
 		oldpixclk= tb->m_core->i_pixclk;
 	}

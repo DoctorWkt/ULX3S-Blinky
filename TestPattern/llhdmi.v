@@ -55,7 +55,7 @@ module llhdmi(
   always @(posedge i_pixclk)
     DrawArea <= (CounterX<640) && (CounterY<480);
 
-  assign o_rd= DrawArea;
+  assign o_rd= ~i_reset & DrawArea;
 
   // Generate horizontal and vertical sync pulses
   always @(posedge i_pixclk)
