@@ -39,16 +39,20 @@
 //
 module	vgatestsrc(i_pixclk, i_reset,
 		// External connections
+		i_width, i_height,
 		i_rd, i_newline, i_newframe,
 		// VGA connections
 		o_pixel);
-	parameter	BITS_PER_COLOR = 8,
-			HW=12, VW=12, WIDTH=640, HEIGHT=480;
+	parameter	BITS_PER_COLOR = 4,
+			HW=12, VW=12;
+		//HW=13,VW=11;
 	localparam	BPC = BITS_PER_COLOR,
 			BITS_PER_PIXEL = 3 * BPC,
 			BPP = BITS_PER_PIXEL;
 	//
 	input	wire			i_pixclk, i_reset;
+	input	wire	[HW-1:0]	i_width;
+	input	wire	[VW-1:0]	i_height;
 	//
 	input	wire		i_rd, i_newline, i_newframe;
 	//
@@ -109,33 +113,33 @@ module	vgatestsrc(i_pixclk, i_reset,
 	begin
 		ypos  <= 0;
 		yline <= 0;
-		yedge <= { 4'h0, HEIGHT[(VW-1):4] };
+		yedge <= { 4'h0, i_height[(VW-1):4] };
 	end else if (i_newline)
 	begin
 		ypos <= ypos + { {(VW-1){1'h0}}, dline };
 		if (ypos >= yedge)
 		begin
 			yline <= yline + 1'b1;
-			yedge <= yedge + { 4'h0, HEIGHT[(VW-1):4] };
+			yedge <= yedge + { 4'h0, i_height[(VW-1):4] };
 		end
 	end
 
 	initial	hpos  = 0;
 	initial	hbar  = 0;
-	initial	hedge = { 4'h0, WIDTH[(HW-1):4] };
+	initial	hedge = 0; // { 4'h0, i_width[(HW-1):4] };
 	always @(posedge i_pixclk)
 	if ((i_reset)||(i_newline))
 	begin
 		hpos <= 0;
 		hbar <= 0;
-		hedge <= { 4'h0, WIDTH[(HW-1):4] };
+		hedge <= { 4'h0, i_width[(HW-1):4] };
 	end else if (i_rd)
 	begin
 		hpos <= hpos + 1'b1;
 		if (hpos >= hedge)
 		begin
 			hbar <= hbar + 1'b1;
-			hedge <= hedge + { 4'h0, WIDTH[(HW-1):4] };
+			hedge <= hedge + { 4'h0, i_width[(HW-1):4] };
 		end
 	end
 
@@ -202,9 +206,9 @@ module	vgatestsrc(i_pixclk, i_reset,
 
 	reg	[(HW-1):0]	last_width;
 	always @(posedge i_pixclk)
-		last_width <= WIDTH;
+		last_width <= i_width;
 
-	// Attempt to discover 1/WIDTH in h_step
+	// Attempt to discover 1/i_width in h_step
 	localparam	FRACB=16;
 	//
 	reg	[(FRACB-1):0]	hfrac, h_step;
@@ -215,16 +219,14 @@ module	vgatestsrc(i_pixclk, i_reset,
 		hfrac <= hfrac + h_step;
 
 	always @(posedge i_pixclk)
-	if ((i_reset)||(WIDTH != last_width))
+	if ((i_reset)||(i_width != last_width))
 		h_step <= 1;
 	else if ((i_newline)&&(hfrac > 0))
 	begin
-/* verilator lint_off WIDTHCONCAT */
-		if (hfrac < {(FRACB){1'b1}} - { {(FRACB-HW){1'b0}}, WIDTH })
+		if (hfrac < {(FRACB){1'b1}} - { {(FRACB-HW){1'b0}}, i_width })
 			h_step <= h_step + 1'b1;
-		else if (hfrac < { {(FRACB-HW){1'b0}}, WIDTH })
+		else if (hfrac < { {(FRACB-HW){1'b0}}, i_width })
 			h_step <= h_step - 1'b1;
-/* verilator lint_on WIDTHCONCAT */
 	end
 
 	always @(posedge i_pixclk)
@@ -277,9 +279,9 @@ module	vgatestsrc(i_pixclk, i_reset,
 		o_pixel <= white;
 	else if (i_rd)
 	begin
-		if (hpos == WIDTH-12'd3)
+		if (hpos == i_width-12'd3)
 			o_pixel <= white;
-		else if ((ypos == 0)||(ypos == HEIGHT-1))
+		else if ((ypos == 0)||(ypos == i_height-1))
 			o_pixel <= white;
 		else
 			o_pixel <= pattern;

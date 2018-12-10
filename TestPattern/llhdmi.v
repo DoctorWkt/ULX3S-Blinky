@@ -4,6 +4,9 @@ module llhdmi(
   i_tmdsclk, i_pixclk,
   i_reset, i_red, i_grn, i_blu,
   o_rd, o_newline, o_newframe,
+`ifdef VERILATOR
+  o_TMDS_red, o_TMDS_grn, o_TMDS_blu,
+`endif
   o_red, o_grn, o_blu);
 
   input wire i_tmdsclk;		// TMDS clock
@@ -18,6 +21,12 @@ module llhdmi(
   output wire o_red;		// Red TMDS pixel stream
   output wire o_grn;		// Green TMDS pixel stream
   output wire o_blu;		// Blue TMDS pixel stream
+`ifdef VERILATOR
+  output wire [9:0] o_TMDS_red, o_TMDS_grn, o_TMDS_blu;
+  assign o_TMDS_red= TMDS_red;
+  assign o_TMDS_grn= TMDS_grn;
+  assign o_TMDS_blu= TMDS_blu;
+`endif
 
   reg [9:0] CounterX, CounterY;
   reg hSync, vSync, DrawArea;
@@ -58,11 +67,11 @@ module llhdmi(
   // Convert the 8-bit colours into 10-bit TMDS values
   wire [9:0] TMDS_red, TMDS_grn, TMDS_blu;
   TMDS_encoder encode_R(.clk(i_pixclk), .VD(i_red), .CD(2'b00),
-					.VDE(DrawArea), .TMDS(TMDS_red));
+                                        .VDE(DrawArea), .TMDS(TMDS_red));
   TMDS_encoder encode_G(.clk(i_pixclk), .VD(i_grn), .CD(2'b00),
-					.VDE(DrawArea), .TMDS(TMDS_grn));
+                                        .VDE(DrawArea), .TMDS(TMDS_grn));
   TMDS_encoder encode_B(.clk(i_pixclk), .VD(i_blu), .CD({vSync,hSync}),
-        				.VDE(DrawArea), .TMDS(TMDS_blu));
+                                        .VDE(DrawArea), .TMDS(TMDS_blu));
 
   // Strobe the TMDS_shift_load once every 10 i_tmdsclks
   // i.e. at the start of new pixel data
@@ -83,9 +92,15 @@ module llhdmi(
   // We will then output the LSB on each i_tmdsclk.
   reg [9:0] TMDS_shift_red=0, TMDS_shift_grn=0, TMDS_shift_blu=0;
   always @(posedge i_tmdsclk) begin
-    TMDS_shift_red <= TMDS_shift_load ? TMDS_red : {1'b0, TMDS_shift_red[9:1]};
-    TMDS_shift_grn <= TMDS_shift_load ? TMDS_grn : {1'b0, TMDS_shift_grn[9:1]};
-    TMDS_shift_blu <= TMDS_shift_load ? TMDS_blu : {1'b0, TMDS_shift_blu[9:1]};
+    if (i_reset) begin
+      TMDS_shift_red <= 0;
+      TMDS_shift_grn <= 0;
+      TMDS_shift_blu <= 0;
+    end else begin
+      TMDS_shift_red <= TMDS_shift_load ? TMDS_red: {1'b0, TMDS_shift_red[9:1]};
+      TMDS_shift_grn <= TMDS_shift_load ? TMDS_grn: {1'b0, TMDS_shift_grn[9:1]};
+      TMDS_shift_blu <= TMDS_shift_load ? TMDS_blu: {1'b0, TMDS_shift_blu[9:1]};
+    end
   end
 
   // Finally output the LSB of each color bitstream

@@ -3,13 +3,14 @@ NEXTPNR=nextpnr-ecp5
 ECPPACK=ecppack
 HDMICODE=DVI_3x3.v
 HDMICODE=llhdmi.v vgatestsrc.v
+ENCODER=TMDS_encoder.v
 
 .PHONY: all
 all: ulx3s_45f_ULX3S_45F.bit
 
-ULX3S_45F.ys: ULX3S_45F.v $(HDMICODE) TMDS_encoder.v clock.v OBUFDS.v
+ULX3S_45F.ys: ULX3S_45F.v $(HDMICODE) $(ENCODER) clock.v OBUFDS.v
 	chmod +x ysgen.sh
-	./ysgen.sh ULX3S_45F.v  $(HDMICODE) TMDS_encoder.v clock.v \
+	./ysgen.sh ULX3S_45F.v  $(HDMICODE) $(ENCODER) clock.v \
 		OBUFDS.v  > ULX3S_45F.ys
 	echo "hierarchy -top ULX3S_45F" >> ULX3S_45F.ys
 	echo "synth_ecp5 -json ULX3S_45F.json" >> ULX3S_45F.ys

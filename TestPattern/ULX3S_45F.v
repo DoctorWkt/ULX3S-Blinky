@@ -26,17 +26,25 @@ module ULX3S_45F (
   wire o_blu;
   wire o_rd, o_newline, o_newframe;
 
+  // A reset line that goes low after 16 ticks
+  reg [2:0] reset_cnt = 0;
+  wire reset = ~reset_cnt[2];
+  always @(posedge clk_25mhz)
+    if (reset) reset_cnt <= reset_cnt + 1;
+
 
   llhdmi llhdmi_instance(
     .i_tmdsclk(clk_250MHz), .i_pixclk(clk_25MHz),
-    .i_reset(1'b0), .i_red(red), .i_grn(grn), .i_blu(blu),
+    .i_reset(reset), .i_red(red), .i_grn(grn), .i_blu(blu),
     .o_rd(o_rd), .o_newline(o_newline), .o_newframe(o_newframe),
     .o_red(o_red), .o_grn(o_grn), .o_blu(o_blu));
 
-  vgatestsrc vgatestsrc_instance(
-    .i_pixclk(clk_25MHz), .i_reset(1'd0),
-    .i_rd(o_rd), .i_newline(o_newline), .i_newframe(o_newframe),
-    .o_pixel(pixel));
+  vgatestsrc #(.BITS_PER_COLOR(8))
+    vgatestsrc_instance(
+      .i_pixclk(clk_25MHz), .i_reset(reset),
+      .i_width(640), .i_height(480),
+      .i_rd(o_rd), .i_newline(o_newline), .i_newframe(o_newframe),
+      .o_pixel(pixel));
 
   OBUFDS OBUFDS_red(.I(o_red), .O(gpdi_dp[2]), .OB(gpdi_dn[2]));
   OBUFDS OBUFDS_grn(.I(o_grn), .O(gpdi_dp[1]), .OB(gpdi_dn[1]));
