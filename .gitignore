@@ -1,0 +1,7 @@
+obj_dir
+blinky_tb
+blinky.json
+
+*_out.config
+*.vcd
+*.bit
