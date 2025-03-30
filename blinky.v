@@ -1,15 +1,12 @@
 `ifdef VERILATOR
 /* verilator lint_off UNUSED */		// Not all of btn gets used, sigh
-module blinky(input i_clk, input [6:0] btn, output [7:0] o_led);
+module blinky(input wire i_clk, input wire [6:0] btn, output wire [7:0] o_led);
 /* verilator lint_on UNUSED */
-    wire i_clk;
-    wire [6:0] btn;
-    wire [7:0] o_led;
 `else
-module top(input clk_25mhz,
-           input [6:0] btn,
-           output [7:0] led,
-           output wifi_gpio0);
+module top(input wire clk_25mhz,
+           input wire [6:0] btn,
+           output wire [7:0] led,
+           output wire wifi_gpio0);
 
     wire i_clk;
 
