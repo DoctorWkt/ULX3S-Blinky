@@ -1,0 +1,2 @@
+read_verilog ULX3S_45F.v clock.v OBUFDS.v llhdmi.v TMDS_encoder.v vgatestsrc.v
+synth_ecp5 -noccu2 -nomux -nodram -json TestPattern.json

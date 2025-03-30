@@ -69,3 +69,16 @@ ifneq ($(DEPS),)
 include $(DEPS)
 endif
 endif
+
+VERILOG_SRCS = OBUFDS.v TMDS_encoder.v ULX3S_45F.v clock.v llhdmi.v pattern.v vgatestsrc.v
+
+TestPattern.json: TestPattern.ys $(VERILOG_SRCS)
+	yosys $<
+
+ulx3s.bit: ulx3s_out.config
+	ecppack $< $@
+
+ulx3s_out.config: TestPattern.json
+	nextpnr-ecp5 --45k --json $< --basecfg ulx3s_empty.config \
+		--lpf ulx3s_v20_segpdi.lpf \
+		--textcfg $@
