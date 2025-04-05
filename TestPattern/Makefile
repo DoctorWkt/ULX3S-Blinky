@@ -31,6 +31,8 @@ VERILATOR_ROOT ?= $(shell bash -c '$(VERILATOR) -V|grep VERILATOR_ROOT | head -1
 ## The directory containing the verilator includes
 VINC := $(VERILATOR_ROOT)/include
 
+VSRCS = verilated verilated_threads verilated_vcd_c
+
 $(VDIRFB)/V$(TOPMOD).cpp: $(TOPMOD).v 
 	$(VERILATOR) $(VFLAGS) -cc --top-module $(TOPMOD) $(VLOGFIL)
 
@@ -38,8 +40,9 @@ $(VDIRFB)/V$(TOPMOD)__ALL.a: $(VDIRFB)/V$(TOPMOD).cpp
 	make --no-print-directory -C $(VDIRFB) -f V$(TOPMOD).mk
 
 $(SIMPROG): $(SIMFILE) $(VDIRFB)/V$(TOPMOD)__ALL.a $(COSIMS)
-	$(GCC) $(CFLAGS) $(VINC)/verilated.cpp				\
-		$(VINC)/verilated_vcd_c.cpp $(SIMFILE) $(COSIMS)	\
+	$(GCC) $(CFLAGS) 				\
+		$(patsubst %, $(VINC)/%.cpp, $(VSRCS))	\
+		$(SIMFILE) $(COSIMS)			\
 		$(VDIRFB)/V$(TOPMOD)__ALL.a -o $(SIMPROG)
 
 test: $(VCDFILE)
