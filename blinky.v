@@ -2,9 +2,6 @@
 /* verilator lint_off UNUSED */		// Not all of btn gets used, sigh
 module blinky(input i_clk, input [6:0] btn, output [7:0] o_led);
 /* verilator lint_on UNUSED */
-    wire i_clk;
-    wire [6:0] btn;
-    wire [7:0] o_led;
 `else
 module top(input clk_25mhz,
            input [6:0] btn,
@@ -21,7 +18,9 @@ module top(input clk_25mhz,
 `endif
 
     localparam ctr_width = 32;
+/* verilator lint_off PROCASSINIT */
     reg [ctr_width-1:0] ctr = 0;
+/* verilator lint_on PROCASSINIT */
 
     always @(posedge i_clk) begin
                ctr <= ctr + 1;
