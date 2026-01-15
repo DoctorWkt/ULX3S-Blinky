@@ -10,9 +10,10 @@ I have also taken Dan Gisselquist's
 test pattern generator, and built a ULX3S project that displays the test
 pattern on the HDMI output.
 
-To do this, ```make -f UMakefile```.
+To do this, ```make bistream``` to create the file
+```ulx3s_45f_ULX3S_45F.bit```.
 
-There is also a make with Verilator, ```make -f Makefile```. This uses the
+There is also a make with Verilator: just do a ```make```. This uses the
 test pattern generator and produces the image file ```image.ppm```.
 
 The _dec_6_2018.jpg_ image is a photo of the first output from the project.
@@ -22,4 +23,3 @@ with some ```/* verilator lint_off UNOPTFLAT */``` lines because the
 code that sets ```q_m``` really isn't right. I've fixed this by creating
 separate wires and bundling them together afterwards. The _dec_10_2018.jpg_
 image shows the current HDMI output from the project.
-

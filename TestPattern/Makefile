@@ -2,67 +2,50 @@
 ## Verilator Rules
 ##
 .PHONY: all
-#.DELETE_ON_ERROR:
-TOPMOD  := DVI_3x3
-TOPMOD  := llhdmi
-TOPMOD  := pattern
-VLOGFIL := $(TOPMOD).v
-VCDFILE := $(TOPMOD).vcd
-SIMPROG := $(TOPMOD)_tb
-SIMFILE := $(SIMPROG).cpp
-VDIRFB  := ./obj_dir
-all: $(VCDFILE)
+all: image.ppm
 
-GCC := g++
-CFLAGS = -g -Wall -I$(VINC) -I $(VDIRFB)
-#
-# Modern versions of Verilator and C++ may require an -faligned-new flag
-# CFLAGS = -g -Wall -faligned-new -I$(VINC) -I $(VDIRFB)
+image.ppm: obj_dir/Vpattern
+	obj_dir/Vpattern > image.ppm
+	
 
-VERILATOR=verilator
-VFLAGS := -O3 -MMD --trace -Wall
-
-## Find the directory containing the Verilog sources.  This is given from
-## calling: "verilator -V" and finding the VERILATOR_ROOT output line from
-## within it.  From this VERILATOR_ROOT value, we can find all the components
-## we need here--in particular, the verilator include directory
-VERILATOR_ROOT ?= $(shell bash -c '$(VERILATOR) -V|grep VERILATOR_ROOT | head -1 | sed -e "s/^.*=\s*//"')
-##
-## The directory containing the verilator includes
-VINC := $(VERILATOR_ROOT)/include
-
-$(VDIRFB)/V$(TOPMOD).cpp: $(TOPMOD).v 
-	$(VERILATOR) $(VFLAGS) -cc --top-module $(TOPMOD) $(VLOGFIL)
-
-$(VDIRFB)/V$(TOPMOD)__ALL.a: $(VDIRFB)/V$(TOPMOD).cpp
-	make --no-print-directory -C $(VDIRFB) -f V$(TOPMOD).mk
-
-$(SIMPROG): $(SIMFILE) $(VDIRFB)/V$(TOPMOD)__ALL.a $(COSIMS)
-	$(GCC) $(CFLAGS) $(VINC)/verilated.cpp				\
-		$(VINC)/verilated_vcd_c.cpp $(SIMFILE) $(COSIMS)	\
-		$(VDIRFB)/V$(TOPMOD)__ALL.a -o $(SIMPROG)
-
-test: $(VCDFILE)
-
-$(VCDFILE): $(SIMPROG)
-	./$(SIMPROG) > image.ppm
+obj_dir/Vpattern: pattern.v pattern_tb.cpp
+	verilator -cc --exe --trace --build -j pattern.v pattern_tb.cpp
 
 ## 
 .PHONY: clean
 clean:
-	rm -rf $(VDIRFB)/ $(SIMPROG) $(VCDFILE) image.ppm
+	rm -rf obj_dir image.ppm *.vcd
+	rm -f ULX3S_45F.ys ULX3S_45F.json ulx3s_45f_ULX3S_45F.config \
+		ulx3s_45f_ULX3S_45F.bit
 
 ##
-## Find all of the Verilog dependencies and submodules
+## ULX3S Rules
 ##
-DEPS := $(wildcard $(VDIRFB)/*.d)
+YOSYS=yosys
+NEXTPNR=nextpnr-ecp5
+ECPPACK=ecppack
+HDMICODE=DVI_3x3.v
+HDMICODE=llhdmi.v vgatestsrc.v
+ENCODER=TMDS_encoder.v
 
-## Include any of these submodules in the Makefile
-## ... but only if we are not building the "clean" target
-## which would (oops) try to build those dependencies again
-##
-ifneq ($(MAKECMDGOALS),clean)
-ifneq ($(DEPS),)
-include $(DEPS)
-endif
-endif
+.PHONY: bitsrream
+bitstream: ulx3s_45f_ULX3S_45F.bit
+
+ulx3s_45f_ULX3S_45F.bit: ulx3s_45f_ULX3S_45F.config
+	$(ECPPACK) --input ulx3s_45f_ULX3S_45F.config \
+		--bit ulx3s_45f_ULX3S_45F.bit
+
+ULX3S_45F.ys: ULX3S_45F.v $(HDMICODE) $(ENCODER) clock.v OBUFDS.v
+	chmod +x ysgen.sh
+	./ysgen.sh ULX3S_45F.v  $(HDMICODE) $(ENCODER) clock.v \
+		OBUFDS.v  > ULX3S_45F.ys
+	echo "hierarchy -top ULX3S_45F" >> ULX3S_45F.ys
+	echo "synth_ecp5 -json ULX3S_45F.json" >> ULX3S_45F.ys
+
+ULX3S_45F.json: ULX3S_45F.ys
+	$(YOSYS) -q ULX3S_45F.ys
+
+ulx3s_45f_ULX3S_45F.config: ULX3S_45F.json
+	$(NEXTPNR) --45k --json ULX3S_45F.json --lpf ulx3s_v20_segpdi.lpf \
+	--package CABGA381 \
+	--textcfg ulx3s_45f_ULX3S_45F.config

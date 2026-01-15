@@ -75,8 +75,11 @@ module llhdmi(
 
   // Strobe the TMDS_shift_load once every 10 i_tmdsclks
   // i.e. at the start of new pixel data
-  reg [3:0] TMDS_mod10=0;
-  reg TMDS_shift_load=0;
+  reg [3:0] TMDS_mod10;
+  reg TMDS_shift_load;
+  initial TMDS_mod10=0;
+  initial TMDS_shift_load=0;
+  
   always @(posedge i_tmdsclk) begin
     if (i_reset) begin
       TMDS_mod10 <= 0;
@@ -90,7 +93,11 @@ module llhdmi(
   // Latch the TMDS colour values into three shift registers
   // at the start of the pixel, then shift them one bit each i_tmdsclk.
   // We will then output the LSB on each i_tmdsclk.
-  reg [9:0] TMDS_shift_red=0, TMDS_shift_grn=0, TMDS_shift_blu=0;
+  reg [9:0] TMDS_shift_red, TMDS_shift_grn, TMDS_shift_blu;
+  initial TMDS_shift_red=0;
+  initial TMDS_shift_grn=0;
+  initial TMDS_shift_blu=0;
+
   always @(posedge i_tmdsclk) begin
     if (i_reset) begin
       TMDS_shift_red <= 0;

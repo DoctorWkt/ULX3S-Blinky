@@ -27,7 +27,9 @@ module ULX3S_45F (
   wire o_rd, o_newline, o_newframe;
 
   // A reset line that goes low after 16 ticks
+  /* verilator lint_off WIDTHTRUNC */
   reg [2:0] reset_cnt = 0;
+  /* verilator lint_on WIDTHTRUNC */
   wire reset = ~reset_cnt[2];
   always @(posedge clk_25mhz)
     if (reset) reset_cnt <= reset_cnt + 1;

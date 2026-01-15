@@ -6,7 +6,7 @@ module TMDS_encoder(
 	input [7:0] VD,  // video data (red, green or blue)
 	input [1:0] CD,  // control data
 	input VDE,  // video data enable, to choose between CD (when VDE=0) and VD (when VDE=1)
-	output reg [9:0] TMDS = 0
+	output reg [9:0] TMDS
 );
 
 wire [3:0] Nb1s = {3'b0, VD[0]} + {3'b0, VD[1]} + {3'b0, VD[2]}
@@ -28,7 +28,11 @@ assign QM7= QM6 ^ VD[7] ^ XNOR;
 assign QM8= ~XNOR;
 wire [8:0] q_m = { QM8, QM7, QM6, QM5, QM4, QM3, QM2, QM1, QM0 };
 
-reg [3:0] balance_acc = 0;
+initial TMDS = 0;
+
+reg [3:0] balance_acc;
+initial balance_acc = 0;
+
 wire [3:0] balance = {3'b0, q_m[0]} + {3'b0, q_m[1]} + {3'b0, q_m[2]}
 	+ {3'b0, q_m[3]} + {3'b0, q_m[4]} + {3'b0, q_m[5]}
 	+ {3'b0, q_m[6]} + {3'b0, q_m[7]} - 4'd4;
