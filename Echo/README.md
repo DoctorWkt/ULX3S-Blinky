@@ -12,3 +12,5 @@ https://github.com/emard/ulx3s/tree/master/doc/constraints .
 
 The serial port runs at 115,200 bps. You will also need to disable
 hardware flow control. With _minicom_, ctrl-A O, Serial port setup, F, Exit.
+
+The project also runs under Verilator 5: just do a `make` and the Verilator simulation will be built and start running. Hit ctrl-C to stop it. You will need to send ctrl-J in order to move down to the next line (instead of the usual Enter key).

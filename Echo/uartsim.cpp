@@ -29,12 +29,57 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <poll.h>
+#include <termios.h>
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <signal.h>
 #include <ctype.h>
+#include <fcntl.h>
 
 #include "uartsim.h"
+
+// Original blocking terminal setting
+struct termios orig_termios;
+
+void reset_terminal_mode(void)
+{
+    tcsetattr(0, TCSANOW, &orig_termios);
+}
+
+void save_old_terminal_mode()
+{
+    tcgetattr(0, &orig_termios);
+}
+
+int ttySetCbreak(void)
+{
+    struct termios t;
+
+    // Save the existing terminal mode
+    // so that we can restore it on exit()
+    save_old_terminal_mode();
+    atexit(reset_terminal_mode);
+
+    if (tcgetattr(0, &t) == -1)
+        return -1;
+
+    t.c_lflag &= ~(ICANON | ECHO);
+    t.c_lflag |= ISIG;
+
+    t.c_iflag &= ~ICRNL;
+
+    t.c_cc[VMIN] = 0;                   /* Character-at-a-time input */
+    t.c_cc[VTIME] = 0;                  /* with blocking */
+
+    if (tcsetattr(0, TCSAFLUSH, &t) == -1)
+        return -1;
+
+    return 0;
+}
+
+
+
+
 
 UARTSIM::UARTSIM(void) {
 	setup(25);	// Set us up for a baud rate of CLK/25
@@ -42,6 +87,9 @@ UARTSIM::UARTSIM(void) {
 	m_tx_baudcounter = 0;
 	m_rx_state = RXIDLE;
 	m_tx_state = TXIDLE;
+
+	// Put terminal into cbreak mode
+  	ttySetCbreak();
 }
 
 void	UARTSIM::setup(unsigned isetup) {
@@ -85,8 +133,8 @@ int	UARTSIM::operator()(const int i_tx) {
 
 			nr = read(STDIN_FILENO, buf, 1);
 			if (1 == nr) {
-				m_tx_data = (-1<<10)
-					// << nstart_bits
+				m_tx_data = (-1<<9)	// One hi stop bit,
+							// one low start bit
 					|((buf[0]<<1)&0x01fe);
 				m_tx_busy = (1<<(10))-1;
 				m_tx_state = TXDATA;
